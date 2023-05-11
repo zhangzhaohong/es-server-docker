@@ -1,18 +1,19 @@
-# GENERAL SETTINS
-
-cluster.name:    "my-cluster"
-node.name:       "my-name"
-node.attr.zone:  "my-zone"
-
-node.data: true
-node.master: true
-
+# GENERAL SETTINGS
+cluster.name: "es-cluster" #集群名称
+node.name: "node-1" #节点名称
+#数据和日志的存储目录
+path.data: /usr/share/elasticsearch/data
+path.logs: /usr/share/elasticsearch/logs
+##设置绑定的ip，设置为0.0.0.0以后就可以让任何计算机节点访问到了
 network.host: 0.0.0.0
-discovery.zen.minimum_master_nodes: 1
-
-http.port: 9200
-transport.tcp.port: 9300
-
+http.port: 9200 #端口
+##设置在集群中的所有节点名称，这个节点名称就是之前所修改的，当然你也可以采用默认的也行，目前 是单机，放入一个节点即可
+# cluster.initial_master_nodes: ["node-1"]
 bootstrap.memory_lock: true
-
 script.allowed_types: inline
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+# 开启密码验证
+xpack.security.enabled: true
+# xpack.license.self_generated.type: basic
+# xpack.security.transport.ssl.enabled: true

@@ -1,14 +1,15 @@
 version: '2'
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.4.0
-    container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.7.1
+    container_name: elasticsearch-server
     ports: 
-      - "9200:9200"
+      - "55005:9200"
     environment:
-      - ELASTIC_PASSWORD=123change...     
+      - ELASTIC_PASSWORD=superadmin
       - discovery.type=single-node
       - xpack.security.enabled=true
+      - xpack.security.enrollment.enabled=true
       - path.data=/usr/share/elasticsearch/data
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
@@ -21,34 +22,37 @@ services:
       - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
       - ./elasticsearch/data:/usr/share/elasticsearch/data      
   logstash:
-    image: docker.elastic.co/logstash/logstash:6.4.0
-    container_name: logstash
+    image: docker.elastic.co/logstash/logstash:8.7.1
+    container_name: logstash-server
     environment:
-      - ELASTICSEARCH_USERNAME=elastic
-      - ELASTICSEARCH_PASSWORD="123change..."
-      - NODE_NAME=my-logstash
+      - ELASTICSEARCH_USERNAME=logstash_system
+      - ELASTICSEARCH_PASSWORD=logstash_admin
+      - ELASTICSEARCH_URL=http://192.168.2.250:55005
+      - NODE_NAME=logstash-server
       - XPACK_MONITORING_ENABLED=true
-      - PATH_CONFIG=/usr/share/logstash/my-confs
+      - PATH_CONFIG=/usr/share/logstash/config.d
     volumes:
-      - ./logstash/conf:/usr/share/logstash/my-confs
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./logstash/conf.d:/usr/share/logstash/config.d
       - ./logstash/csv:/usr/share/logstash/csv
     links:
       - elasticsearch
     depends_on:
       - elasticsearch
   kibana:
-    image: docker.elastic.co/kibana/kibana:6.4.0
-    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:8.7.1
+    container_name: kibana-server
     ports: 
-      - "5601:5601"
+      - "55006:5601"
     environment:
-      - ELASTICSEARCH_USERNAME=elastic
-      - ELASTICSEARCH_PASSWORD="123change..."
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
-      - SERVER_NAME=my-kibana
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=kibana_admin
+      - ELASTICSEARCH_URL=http://192.168.2.250:55005
+      - SERVER_NAME=kibana-server
       - XPACK_SECURITY_ENABLED=true
       - PATH_DATA=/usr/share/kibana/data
     volumes:
+      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
       - ./kibana/data:/usr/share/kibana/data
     links:
       - elasticsearch
