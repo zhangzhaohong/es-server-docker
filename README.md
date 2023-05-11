@@ -28,3 +28,8 @@ if you liked this project, please make a contribution and help to keep this and 
 BTC Wallet: `1G535x1rYdMo9CNdTGK3eG6XJddBHdaqfX`
 
 ![1G535x1rYdMo9CNdTGK3eG6XJddBHdaqfX](https://i.imgur.com/mN7ueoE.png)
+
+## update password
+docker exec -it elasticsearch-server /bin/bash
+cd /usr/share/elasticsearch/bin
+./elasticsearch-setup-passwords interactive
