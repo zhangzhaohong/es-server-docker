@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.7.1
@@ -6,6 +6,7 @@ services:
     restart: always
     ports:
       - "55005:9200"
+      - "55006:9300"
     environment:
       - ELASTIC_PASSWORD=superadmin
       - discovery.type=single-node
@@ -45,7 +46,7 @@ services:
     image: docker.elastic.co/kibana/kibana:8.7.1
     container_name: kibana-server
     ports:
-      - "55006:5601"
+      - "55007:5601"
     restart: always
     environment:
       - ELASTICSEARCH_USERNAME=kibana_system
