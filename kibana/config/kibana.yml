@@ -9,3 +9,5 @@ elasticsearch.hosts: [ "http://192.168.2.250:55005" ]
 elasticsearch.username: "kibana_system"
 elasticsearch.password: "kibana_admin"
 monitoring.ui.container.elasticsearch.enabled: true
+
+i18n.locale: "zh-CN"
