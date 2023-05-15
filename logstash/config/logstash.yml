@@ -2,6 +2,8 @@ http.host: 0.0.0.0
 node.name: logstash-server
 path.config: /usr/share/logstash/config.d
 path.logs: /var/log/logstash
+xpack.management.pipeline.id:
+- api-analytics-process
 xpack.monitoring.elasticsearch.hosts:
 - http://192.168.2.250:55005
 xpack.monitoring.elasticsearch.password: logstash_admin
