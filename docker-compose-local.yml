@@ -1,8 +1,12 @@
 version: '3'
-# replace 192.168.1.1 to real server ip
 services:
   elasticsearch:
-    image: docker.nju.edu.cn/library/elasticsearch:8.8.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.8.1
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     container_name: elasticsearch-server
     restart: always
     ports:
@@ -22,40 +26,39 @@ services:
     #     hard: -1
     # mem_limit: 1g
     volumes:
-      - /data/docker/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
-      - /data/docker/elasticsearch/data:/usr/share/elasticsearch/data
-      - /data/docker/elasticsearch/logs:/usr/share/elasticsearch/logs
-    deploy:
-      resources:
-        limits:
-          memory: 14G
-          cpus: "8.00"
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./elasticsearch/data:/usr/share/elasticsearch/data
   logstash:
-    image: docker.nju.edu.cn/library/logstash:8.8.1
+    image: docker.elastic.co/logstash/logstash:8.8.1
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     container_name: logstash-server
     restart: always
     environment:
       - ELASTICSEARCH_USERNAME=logstash_system
       - ELASTICSEARCH_PASSWORD=logstash_admin
-      - ELASTICSEARCH_URL=http://192.168.1.1:55005
+      - ELASTICSEARCH_URL=http://192.168.2.250:55005
       - NODE_NAME=logstash-server
       - XPACK_MONITORING_ENABLED=true
       - PATH_CONFIG=/usr/share/logstash/config.d
     volumes:
-      - /data/docker/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
-      - /data/docker/logstash/conf.d:/usr/share/logstash/config.d
-      - /data/docker/logstash/csv:/usr/share/logstash/csv
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./logstash/conf.d:/usr/share/logstash/config.d
+      - ./logstash/csv:/usr/share/logstash/csv
     links:
       - elasticsearch
     depends_on:
       - elasticsearch
-    deploy:
-      resources:
-        limits:
-          memory: 14G
-          cpus: "8.00"
   kibana:
-    image: docker.nju.edu.cn/library/kibana:8.8.1
+    image: docker.elastic.co/kibana/kibana:8.8.1
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     container_name: kibana-server
     ports:
       - "55007:5601"
@@ -63,19 +66,14 @@ services:
     environment:
       - ELASTICSEARCH_USERNAME=kibana_system
       - ELASTICSEARCH_PASSWORD=kibana_admin
-      - ELASTICSEARCH_URL=http://192.168.1.1:55005
+      - ELASTICSEARCH_URL=http://192.168.2.250:55005
       - SERVER_NAME=kibana-server
       - XPACK_SECURITY_ENABLED=true
       - PATH_DATA=/usr/share/kibana/data
     volumes:
-      - /data/docker/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
-      - /data/docker/kibana/data:/usr/share/kibana/data
+      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
+      - ./kibana/data:/usr/share/kibana/data
     links:
       - elasticsearch
     depends_on:
       - elasticsearch
-    deploy:
-      resources:
-        limits:
-          memory: 14G
-          cpus: "8.00"
