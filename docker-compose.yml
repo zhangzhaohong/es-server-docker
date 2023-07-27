@@ -30,9 +30,9 @@ services:
         limits:
           memory: 14G
           cpus: "8.00"
-  logstash:
+  logstash-api-analytics:
     image: docker.nju.edu.cn/library/logstash:8.8.1
-    container_name: logstash-server
+    container_name: logstash-api-analytics-cluster-server
     restart: always
     environment:
       - ELASTICSEARCH_USERNAME=logstash_system
@@ -42,9 +42,33 @@ services:
       - XPACK_MONITORING_ENABLED=true
       - PATH_CONFIG=/usr/share/logstash/config.d
     volumes:
-      - /data/docker/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
-      - /data/docker/logstash/conf.d:/usr/share/logstash/config.d
-      - /data/docker/logstash/csv:/usr/share/logstash/csv
+      - /data/docker/logstash-api-analytics/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - /data/docker/logstash-api-analytics/conf.d:/usr/share/logstash/config.d
+      - /data/docker/logstash-api-analytics/csv:/usr/share/logstash/csv
+    links:
+      - elasticsearch
+    depends_on:
+      - elasticsearch
+    deploy:
+      resources:
+        limits:
+          memory: 14G
+          cpus: "8.00"
+  logstash-event-tracker:
+    image: docker.nju.edu.cn/library/logstash:8.8.1
+    container_name: logstash-event-tracker-cluster-server
+    restart: always
+    environment:
+      - ELASTICSEARCH_USERNAME=logstash_system
+      - ELASTICSEARCH_PASSWORD=logstash_admin
+      - ELASTICSEARCH_URL=http://192.168.1.1:55005
+      - NODE_NAME=logstash-server
+      - XPACK_MONITORING_ENABLED=true
+      - PATH_CONFIG=/usr/share/logstash/config.d
+    volumes:
+      - /data/docker/logstash-event-tracker/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - /data/docker/logstash-event-tracker/conf.d:/usr/share/logstash/config.d
+      - /data/docker/logstash-event-tracker/csv:/usr/share/logstash/csv
     links:
       - elasticsearch
     depends_on:
